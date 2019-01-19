@@ -1,20 +1,35 @@
 var Messages = {
-  format: (data) => {
-    var messageArr = [];
-      for (var i = 0; i < data.length; i++) {
-        if(data[i].roomname === $(RoomsView.$select).val()) {
-          var obj = {};
-          obj.roomname = data[i].roomname;
-          obj.username = data[i].username;
-          obj.text = data[i].text;
-          messageArr.push(obj);
-        }
-        // var obj = {};
-        // obj.roomname = data[i].roomname;
-        // obj.username = data[i].username;
-        // obj.text = escape(data[i].text);
-        // messageArr.push(obj);
+
+   _data: {},
+
+
+  items: function() {
+    return _.chain(Object.values(Messages._data)).sortBy('createdAt');
+  },
+
+  add: function(message, callback = ()=>{}) {
+    Messages._data[message.objectId] = message;
+    callback(Messages.items());
+  },
+
+  update: function(messages, callback = ()=>{}) {
+    var length = Object.keys(Messages._data).length;
+
+    for (let message of messages) {
+      Messages._data[message.objectId] = Messages._conform(message);
     }
-    return messageArr;
+
+    // only invoke the callback if something changed
+    if (Object.keys(Messages._data).length !== length) {
+      callback(Messages.items());
+    }
+  },
+
+  _conform: function(message) {
+    // ensure each message object conforms to expected shape
+    message.text = message.text || '';
+    message.username = message.username || '';
+    message.roomname = message.roomname || '';
+    return message;
   }
-};
+}

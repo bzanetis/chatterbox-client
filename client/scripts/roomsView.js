@@ -4,30 +4,38 @@ var RoomsView = {
   $select: $('#rooms select'),
 
   initialize: function(room) {
-    RoomsView.$button.on('click', function(){
-        Rooms.add();
-    });
+    RoomsView.$select.on('change', RoomsView.handleChange);
+    RoomsView.$button.on('click', RoomsView.handleClick);
+      },
 
-    Parse.readAll((data) => {
-      RoomsView.room(data.results);
-    });
+
+  render: function() {
+
+  RoomsView.$select.html('');
+    Rooms
+      .items()
+      .each(RoomsView.renderRoom);
+    RoomsView.$select.val(Rooms.selected);
   },
 
-  renderRoom: function(room) {
-    var renderedRoom = Rooms.render({'roomname': room});
-    $(RoomsView.$select).append(renderedRoom);
+  renderRoom: function(roomname) {
+    var $option = $('<option>').val(roomname).text(roomname);
+    RoomsView.$select.append($option);
   },
 
-  room: (data) => {
-    var rooms = [];
-    for (var i = 0; i < data.length; i++) {
-      if(!rooms.includes(data[i].roomname) && data[i].roomname && data[i].roomname.length < 50) {
-        rooms.push(data[i].roomname);
-      }
+  handleChange: function(event) {
+    Rooms.selected = RoomsView.$select.val();
+    MessagesView.render();
+  },
+
+  handleClick: function(event) {
+    var roomname = prompt('Enter room name');
+    if (roomname) {
+      Rooms.add(roomname, () => {
+        RoomsView.render();
+        MessagesView.render();
+      });
     }
-    rooms.forEach(function(room) {
-      RoomsView.renderRoom(room);
-    })
-  }
+      }
 
 };

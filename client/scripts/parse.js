@@ -9,11 +9,11 @@ var Parse = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: successCB,
-      error: errorCB || function(error) {
-        console.error('chatterbox: Failed to fetch messages', error);
+      error: errorCB || function (error) {
+        console.error('chatterbox: Failed to create message', error);
       }
     });
-  },
+      },
 
   readAll: function(successCB, errorCB = null) {
     $.ajax({
